@@ -34,7 +34,7 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
       - name: Start all services with Docker Compose
-        run: docker-compose up -d
+        run: docker-compose -f ci.docker-compose.yml up -d
       - name: Wait for Go application to be ready
         run: |
           until curl --output /dev/null --silent --head --fail http://go-app:9000/health; do
@@ -44,4 +44,4 @@ jobs:
       - name: Run integration tests
         run: docker-compose exec app go test ./... -v -tags=integration
       - name: Shutdown services
-        run: docker-compose down
+        run: docker-compose -f ci.docker-compose.yml down
