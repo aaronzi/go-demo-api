@@ -15,6 +15,26 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/health": {
+            "get": {
+                "description": "Responds with OK if the service is up and running",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health Check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/movies": {
             "get": {
                 "description": "Get all movies",
@@ -31,7 +51,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api.Movie"
+                                "$ref": "#/definitions/internal_api.APIMovie"
                             }
                         }
                     }
@@ -64,7 +84,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api.Movie"
+                            "$ref": "#/definitions/internal_api.APIMovie"
                         }
                     },
                     "404": {
@@ -75,7 +95,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_api.Movie": {
+        "internal_api.APIMovie": {
             "type": "object",
             "properties": {
                 "director": {
@@ -88,7 +108,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "year": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }

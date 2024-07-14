@@ -6,6 +6,8 @@ package integration_test
 import (
 	"encoding/json"
 	"go-demo-api/internal/api"
+	"go-demo-api/internal/db"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,8 +17,21 @@ import (
 )
 
 func TestGetMovies_Integration(t *testing.T) {
+	// Initialize the database connection
+	database, err := db.NewDB()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
+
+	// Instantiate the repository
+	repo := &db.MovieRepository{DB: database}
+
+	// Instantiate the handler struct with the repository
+	movieHandler := &api.MovieHandler{Repo: repo}
+
+	// Setup router and server for testing
 	r := mux.NewRouter()
-	r.HandleFunc("/movies", api.GetMovies).Methods("GET")
+	r.HandleFunc("/movies", movieHandler.GetMovies).Methods("GET")
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -28,7 +43,7 @@ func TestGetMovies_Integration(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
 
-	var movies []api.Movie
+	var movies []db.Movie
 	err = json.NewDecoder(resp.Body).Decode(&movies)
 	if err != nil {
 		t.Fatal(err)
@@ -38,27 +53,40 @@ func TestGetMovies_Integration(t *testing.T) {
 }
 
 func TestGetMovie_Integration(t *testing.T) {
+	// Initialize the database connection
+	database, err := db.NewDB()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
+
+	// Instantiate the repository
+	repo := &db.MovieRepository{DB: database}
+
+	// Instantiate the handler struct with the repository
+	movieHandler := &api.MovieHandler{Repo: repo}
+
+	// Setup router and server for testing
 	r := mux.NewRouter()
-	// Assuming api.GetMovie is the handler for getting a single movie by ID
-	r.HandleFunc("/movies/{id}", api.GetMovie).Methods("GET")
+	r.HandleFunc("/movies/{id}", movieHandler.GetMovie).Methods("GET")
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	// Replace "someValidMovieID" with a valid movie ID that exists in your data source
-	resp, err := http.Get(ts.URL + "/movies/1")
+	resp, err := http.Get(ts.URL + "/movies/13d7bd2f-732b-465a-bcbe-4b0bc58c3fad")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
 
-	var movie api.Movie
+	var movie db.Movie
 	err = json.NewDecoder(resp.Body).Decode(&movie)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Replace "someValidMovieID" with the same valid movie ID used in the request
-	assert.Equal(t, "1", movie.ID, "Expected the movie ID to match")
+	// Log the movie details
+	log.Printf("TEst: %+v\n", movie)
+
+	assert.Equal(t, "Inception", movie.Title, "Expected the movie ID to match")
 }

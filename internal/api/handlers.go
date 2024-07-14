@@ -2,24 +2,24 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
+	"go-demo-api/internal/db"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
 // Movie struct to hold movie data
-type Movie struct {
+type APIMovie struct {
+	db.Movie
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Director string `json:"director"`
-	Year     string `json:"year"`
+	Year     int    `json:"year"`
 }
 
-// Movies slice to seed movie data
-var movies = []Movie{
-	{ID: "1", Title: "Inception", Director: "Christopher Nolan", Year: "2010"},
-	{ID: "2", Title: "The Matrix", Director: "Lana Wachowski, Lilly Wachowski", Year: "1999"},
-	{ID: "3", Title: "Interstellar", Director: "Christopher Nolan", Year: "2014"},
+type MovieHandler struct {
+	Repo db.MovieRepositoryInterface
 }
 
 // getMovies godoc
@@ -27,9 +27,15 @@ var movies = []Movie{
 // @Description Get all movies
 // @Tags movies
 // @Produce json
-// @Success 200 {array} Movie
+// @Success 200 {array} APIMovie
 // @Router /movies [get]
-func GetMovies(w http.ResponseWriter, r *http.Request) {
+func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
+	movies, err := h.Repo.FindAllMovies()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(movies)
 }
@@ -41,18 +47,40 @@ func GetMovies(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param   id   path    string     true  "Movie ID"
-// @Success 200  {object}  Movie
+// @Success 200  {object}  APIMovie
 // @Failure 404  {object}  nil  "Movie not found"
 // @Router /movies/{id} [get]
-func GetMovie(w http.ResponseWriter, r *http.Request) {
+func (h *MovieHandler) GetMovie(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	for _, movie := range movies {
-		if movie.ID == id {
-			json.NewEncoder(w).Encode(movie)
-			return
+	movie, err := h.Repo.FindMovieByID(id)
+	if err != nil {
+		// Check if the error is a "not found" error
+		if errors.Is(err, db.ErrNotFound) {
+			http.NotFound(w, r)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	http.NotFound(w, r)
+	if movie == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(movie)
+}
+
+// HealthCheckHandler responds to health check requests
+// @Summary Health Check
+// @Description Responds with OK if the service is up and running
+// @Tags health
+// @Produce plain
+// @Success 200 {string} string "OK"
+// @Router /health [get]
+func (h *MovieHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }

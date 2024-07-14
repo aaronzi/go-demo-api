@@ -1,5 +1,5 @@
 definitions:
-  internal_api.Movie:
+  internal_api.APIMovie:
     properties:
       director:
         type: string
@@ -8,11 +8,24 @@ definitions:
       title:
         type: string
       year:
-        type: string
+        type: integer
     type: object
 info:
   contact: {}
 paths:
+  /health:
+    get:
+      description: Responds with OK if the service is up and running
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Health Check
+      tags:
+      - health
   /movies:
     get:
       description: Get all movies
@@ -23,7 +36,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/internal_api.Movie'
+              $ref: '#/definitions/internal_api.APIMovie'
             type: array
       summary: Retrieve list of movies
       tags:
@@ -45,7 +58,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_api.Movie'
+            $ref: '#/definitions/internal_api.APIMovie'
         "404":
           description: Movie not found
       summary: Get a movie

@@ -1,11 +1,12 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/go
 {
-    "name": "Go",
-    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/go:1-1.22-bookworm",
-    // Features to add to the dev container. More info: https://containers.dev/features.
-    // "features": {},
+    "name": "Go with MySQL",
+    // Specify the Docker Compose file instead of a single image
+    "dockerComposeFile": "docker-compose.yml",
+    // Define the service name of your application container defined in the Docker Compose file
+    "service": "app",
+    "workspaceFolder": "/workspace",
     // Configure tool-specific properties.
     "customizations": {
         // Configure properties specific to VS Code.
@@ -16,19 +17,8 @@
             ]
         }
     },
-    // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    // "forwardPorts": [9000],
-    // Use 'portsAttributes' to set default properties for specific forwarded ports. 
-    // More info: https://containers.dev/implementors/json_reference/#port-attributes
-    "portsAttributes": {
-        "9000": {
-            "label": "Hello Remote World",
-            "onAutoForward": "notify"
-        }
-    },
     // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "go version",
-    "postCreateCommand": "go install github.com/swaggo/swag/cmd/swag@latest",
+    "postCreateCommand": "go install github.com/swaggo/swag/cmd/swag@latest"
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     // "remoteUser": "root"
 }
