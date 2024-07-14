@@ -3,6 +3,8 @@ package main
 import (
 	_ "go-demo-api/docs"
 	"go-demo-api/internal/api"
+	"go-demo-api/internal/db"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,9 +12,23 @@ import (
 )
 
 func main() {
+	// Initialize the database connection
+	database, err := db.NewDB()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
+
+	// Instantiate the repository
+	repo := &db.MovieRepository{DB: database}
+
+	// Instantiate the handler struct with the repository
+	movieHandler := &api.MovieHandler{Repo: repo}
+
 	r := mux.NewRouter()
-	r.HandleFunc("/movies", api.GetMovies).Methods("GET")
-	r.HandleFunc("/movies/{id}", api.GetMovie).Methods("GET")
+
+	// Use the methods of movieHandler as HTTP handlers
+	r.HandleFunc("/movies", movieHandler.GetMovies).Methods("GET")
+	r.HandleFunc("/movies/{id}", movieHandler.GetMovie).Methods("GET")
 
 	// Serve Swagger UI
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)

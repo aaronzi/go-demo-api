@@ -31,7 +31,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_api.Movie"
+                                "$ref": "#/definitions/internal_api.APIMovie"
                             }
                         }
                     }
@@ -64,7 +64,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_api.Movie"
+                            "$ref": "#/definitions/internal_api.APIMovie"
                         }
                     },
                     "404": {
@@ -75,7 +75,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_api.Movie": {
+        "internal_api.APIMovie": {
             "type": "object",
             "properties": {
                 "director": {
@@ -88,7 +88,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "year": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
