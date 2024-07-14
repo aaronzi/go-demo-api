@@ -8,7 +8,7 @@ services:
     ports:
       - 9000:9000
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health > /proc/1/fd/1 2>/proc/1/fd/2 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
