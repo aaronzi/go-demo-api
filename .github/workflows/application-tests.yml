@@ -34,8 +34,6 @@ jobs:
           MYSQL_DATABASE: moviesdb
           MYSQL_USER: user
           MYSQL_PASSWORD: password
-        ports:
-          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
