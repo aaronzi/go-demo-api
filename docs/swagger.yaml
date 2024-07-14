@@ -1,0 +1,29 @@
+definitions:
+  main.Movie:
+    properties:
+      director:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      year:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /movies:
+    get:
+      description: Get all movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Movie'
+            type: array
+      summary: Retrieve list of movies
+swagger: "2.0"
