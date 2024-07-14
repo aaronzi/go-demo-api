@@ -37,11 +37,11 @@ jobs:
         run: docker-compose -f ci.docker-compose.yml up -d
       - name: Wait for Go application to be ready
         run: |
-          until curl --output /dev/null --silent --head --fail http://go-app:9000/health; do
+          until curl --output /dev/null --silent --head --fail http://localhost:9000/health; do
             printf '.'
             sleep 5
           done
       - name: Run integration tests
-        run: docker-compose exec app go test ./... -v -tags=integration
+        run: docker-compose -f ci.docker-compose.yml exec -T app go test ./... -v -tags=integration
       - name: Shutdown services
         run: docker-compose -f ci.docker-compose.yml down
