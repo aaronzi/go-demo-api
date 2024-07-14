@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "go-demo-api/docs"
-	"go-demo-api/internal/api" // Import the new package
+	"go-demo-api/internal/api"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,7 +11,8 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/movies", api.GetMovies).Methods("GET") // Update the handler reference
+	r.HandleFunc("/movies", api.GetMovies).Methods("GET")
+	r.HandleFunc("/movies/{id}", api.GetMovie).Methods("GET")
 
 	// Serve Swagger UI
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)

@@ -28,4 +28,4 @@ go.work.sum
 .vscode/
 
 # Output of vscode debugger (files tsarting with __debug_)
-__debug_*
+**/__debug_*

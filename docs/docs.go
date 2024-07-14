@@ -21,6 +21,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "movies"
+                ],
                 "summary": "Retrieve list of movies",
                 "responses": {
                     "200": {
@@ -28,16 +31,51 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/main.Movie"
+                                "$ref": "#/definitions/internal_api.Movie"
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/movies/{id}": {
+            "get": {
+                "description": "Get a single movie by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "summary": "Get a movie",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_api.Movie"
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "main.Movie": {
+        "internal_api.Movie": {
             "type": "object",
             "properties": {
                 "director": {
