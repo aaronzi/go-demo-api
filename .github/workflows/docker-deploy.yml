@@ -1,16 +1,31 @@
 name: Build and Deploy to Docker Hub
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Application Tests"]
+    types:
+    - completed
+    branches: [main]
 
 jobs:
-  build-and-push:
-    name: Docker Build and Push
+  check_previous_success:
     runs-on: ubuntu-latest
-
+    outputs:
+      success: ${{ steps.check_success.outputs.success }}
+    steps:
+    - name: Check if previous workflows were successful
+      id: check_success
+      run: |
+        if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+          echo "One or more of the required workflows failed."
+          echo "::set-output name=success::false"
+          exit 1
+        fi
+        echo "::set-output name=success::true"
+  build-and-push:
+    needs: check_previous_success
+    if: needs.check_previous_success.outputs.success == 'true'
+    runs-on: ubuntu-latest
     steps:
     - name: Check out code
       uses: actions/checkout@v3
