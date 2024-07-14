@@ -47,3 +47,20 @@ jobs:
           aaronzi/go-demo-api:${{ github.sha }}
           aaronzi/go-demo-api:latest
         platforms: linux/amd64,linux/arm64
+
+    # Mirror the image to GitHub Packages
+    - name: Pull Docker Image from Docker Hub
+      run: docker pull aaronzi/go-demo-api:latest
+
+    - name: Tag the Image for GitHub Packages
+      run: docker tag aaronzi/go-demo-api:latest ghcr.io/${{ github.repository_owner }}/go-demo-api:latest
+
+    - name: Log in to GitHub Packages
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push the Image to GitHub Packages
+      run: docker push ghcr.io/${{ github.repository_owner }}/go-demo-api:latest
