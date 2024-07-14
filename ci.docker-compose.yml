@@ -4,7 +4,7 @@ services:
     container_name: go-app
     volumes:
       - .:/workspace:cached
-    command: /bin/sh -c "cd /workspace && go run main.go"
+    command: /bin/sh -c "cd /workspace/cmd/movie-api && go run main.go"
     ports:
       - 9000:9000
 
