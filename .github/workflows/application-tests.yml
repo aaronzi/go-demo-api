@@ -42,6 +42,6 @@ jobs:
             sleep 5
           done
       - name: Run integration tests
-        run: docker-compose -f ci.docker-compose.yml exec -T app go test ./... -v -tags=integration
+        docker exec app /bin/sh -c "cd /workspace && go test ./... -tags=integration"
       - name: Shutdown services
         run: docker-compose -f ci.docker-compose.yml down
