@@ -8,7 +8,7 @@ import (
 
 func NewDB() (*sql.DB, error) {
 	// Construct the Data Source Name (DSN)
-	dsn := "user:password@tcp(192.168.178.23:3306)/moviesdb?parseTime=true"
+	dsn := "user:password@tcp(mysql)/moviesdb?parseTime=true"
 
 	// Open a DB connection
 	db, err := sql.Open("mysql", dsn)
