@@ -72,3 +72,15 @@ func (h *MovieHandler) GetMovie(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(movie)
 }
+
+// HealthCheckHandler responds to health check requests
+// @Summary Health Check
+// @Description Responds with OK if the service is up and running
+// @Tags health
+// @Produce plain
+// @Success 200 {string} string "OK"
+// @Router /health [get]
+func (h *MovieHandler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}

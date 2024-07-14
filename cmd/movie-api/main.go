@@ -29,6 +29,7 @@ func main() {
 	// Use the methods of movieHandler as HTTP handlers
 	r.HandleFunc("/movies", movieHandler.GetMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", movieHandler.GetMovie).Methods("GET")
+	r.HandleFunc("/health", movieHandler.HealthCheckHandler).Methods("GET")
 
 	// Serve Swagger UI
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
