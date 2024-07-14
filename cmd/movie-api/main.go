@@ -32,7 +32,7 @@ func main() {
 	r.HandleFunc("/health", movieHandler.HealthCheckHandler).Methods("GET")
 
 	// Serve Swagger UI
-	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	r.PathPrefix("/swagger-ui/").Handler(httpSwagger.WrapHandler)
 
 	http.ListenAndServe(":9000", r)
 }
