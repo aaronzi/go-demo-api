@@ -4,7 +4,6 @@ services:
     container_name: app
     volumes:
       - .:/workspace:cached
-    working_dir: /workspace/cmd/movie-api
     command: /bin/sh -c "go test ./... -v -tags=integration"
     ports:
       - 9000:9000
