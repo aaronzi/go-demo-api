@@ -37,9 +37,9 @@ jobs:
         run: docker-compose -f ci.docker-compose.yml up -d
       - name: Wait for services to be ready
         run: |
-          until $(curl --output /dev/null --silent --head --fail http://localhost:9000/health); do
-            echo "Waiting for the Go app to be ready..."
-            sleep 1
+          until [ "$(docker inspect --format='{{.State.Health.Status}}' app)" == "healthy" ]; do
+            echo "Waiting for the app service to be healthy..."
+            sleep 5
           done
       - name: Run integration tests
         run: docker-compose -f ci.docker-compose.yml exec -T app go test ./... -v -tags=integration
