@@ -35,6 +35,12 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
       - name: Start all services with Docker Compose
         run: docker-compose -f ci.docker-compose.yml up -d
+      - name: Wait for services to be ready
+        run: |
+          until $(curl --output /dev/null --silent --head --fail http://localhost:9000/health); do
+            echo "Waiting for the Go app to be ready..."
+            sleep 1
+          done
       - name: Run integration tests
         run: docker-compose -f ci.docker-compose.yml exec -T app go test ./... -v -tags=integration
       - name: Shutdown services
