@@ -26,35 +26,22 @@ jobs:
     name: Run Integration Tests
     needs: unit-test
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:lts
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: moviesdb
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
       - name: Set up Docker Compose
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-      - name: Start services with Docker Compose
+      - name: Start all services with Docker Compose
         run: docker-compose up -d
-      - name: Get dependencies
-        run: go mod download
+      - name: Wait for Go application to be ready
+        run: |
+          until curl --output /dev/null --silent --head --fail http://localhost:9000; do
+            printf '.'
+            sleep 5
+          done
       - name: Run integration tests
-        run: go test ./... -v -tags=integration
+        run: docker-compose exec app go test ./... -v -tags=integration
       - name: Shutdown services
         run: docker-compose down
