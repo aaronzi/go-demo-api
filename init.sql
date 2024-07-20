@@ -13,8 +13,7 @@ CREATE TABLE IF NOT EXISTS Movies (
 );
 
 CREATE TABLE IF NOT EXISTS Verifications (
-    id int PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) PRIMARY KEY,
     verification_code VARCHAR(255) NOT NULL,
     verified BOOLEAN NOT NULL DEFAULT FALSE    
 );

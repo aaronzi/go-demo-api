@@ -33,8 +33,8 @@ var (
 	VerifyFunc func(email, code string) (string, error)
 )
 
-func (m *MockRepository) CreateVerification(email string) error {
-	return nil
+func (m *MockRepository) CreateVerification(email string) (string, error) {
+	return "", nil
 }
 
 func (m *MockRepository) Verify(email, code string) (string, error) {

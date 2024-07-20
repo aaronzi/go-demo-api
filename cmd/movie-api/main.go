@@ -4,6 +4,8 @@ import (
 	_ "go-demo-api/docs"
 	"go-demo-api/internal/api"
 	"go-demo-api/internal/db"
+	user "go-demo-api/internal/db/user"
+	verification "go-demo-api/internal/db/verification"
 	"log"
 	"net/http"
 
@@ -20,8 +22,8 @@ func main() {
 
 	// Instantiate the repository
 	movieRepo := &db.MovieRepository{DB: database}
-	userRepo := &db.UserRepository{DB: database}
-	verifyRepo := &db.VerificationRepository{DB: database}
+	verifyRepo := &verification.EmailVerificationRepository{VerificationRepository: &verification.VerificationRepository{DB: database}}
+	userRepo := &user.UserRepository{DB: database, VerificationRepository: verifyRepo}
 
 	// Instantiate the handler struct with the repository
 	movieHandler := &api.MovieHandler{Repo: movieRepo}

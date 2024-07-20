@@ -3,13 +3,17 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"log"
+
+	db "go-demo-api/internal/db"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository struct {
-	DB *sql.DB
+	DB                     *sql.DB
+	VerificationRepository db.VerificationRepositoryInterface
 }
 type User struct {
 	ID       string
@@ -30,27 +34,23 @@ func (repo *UserRepository) RegisterUser(username string, email string, password
 	userid := uuid.New().String()
 	hashedpassword, err := HashPassword(password)
 	if err != nil {
+		log.Fatalf("Error hashing password: %v", err)
 		return err
 	}
 	_, err = repo.DB.Exec("INSERT INTO Users (id, username, email, password_hash) VALUES (?, ?, ?, ?)", userid, username, email, hashedpassword)
 
 	if err != nil {
+		log.Fatalf("Error inserting user: %v", err)
 		return err
 	}
 
-	database, err := NewDB()
-
-	// Instantiate the repository
-	verificationRepo := &VerificationRepository{DB: database}
-	verificationError := verificationRepo.CreateVerification(email)
-
-	if verificationError != nil {
-		return verificationError
-	}
+	_, err = repo.VerificationRepository.CreateVerification(email)
 
 	if err != nil {
+		log.Fatalf("Error inserting verification: %v", err)
 		return err
 	}
+
 	return nil
 }
 

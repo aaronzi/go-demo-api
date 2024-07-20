@@ -2,16 +2,11 @@ package db
 
 import (
 	"errors"
-	"go-demo-api/internal/util"
 	"log"
-	"os"
 
 	"database/sql"
-	b64 "encoding/base64"
 	"math/rand"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 type VerificationRepository struct {
@@ -31,30 +26,21 @@ func GenerateVerificationCode(length int) string {
 	return string(result)
 }
 
-func (v *VerificationRepository) CreateVerification(email string) error {
+func (v *VerificationRepository) CreateVerification(email string) (string, error) {
 	verificationCode := GenerateVerificationCode(6)
 
-	_, err := v.DB.Exec("INSERT INTO Verifications (email, verification_code, verified) VALUES (?, ?, ?)", email, verificationCode, false)
+	_, err := v.DB.Exec(`
+		INSERT INTO Verifications (email, verification_code, verified) 
+		VALUES (?, ?, ?) 
+		ON DUPLICATE KEY UPDATE 
+			verification_code = VALUES(verification_code), 
+			verified = VALUES(verified)`,
+		email, verificationCode, false)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	env_error := godotenv.Load("/workspace/.env")
-	if env_error != nil {
-		return env_error
-	}
-
-	var server = os.Getenv("SERVER_ADDRESS")
-
-	encodedMail := b64.RawURLEncoding.EncodeToString([]byte(email))
-	encodedCode := b64.RawURLEncoding.EncodeToString([]byte(verificationCode))
-
-	sendMailError := util.SendEmail(email, "Verification Code", "<a href='"+server+"/verify?email="+encodedMail+"&code="+encodedCode+"'>Click here to verify your email</a>")
-	if sendMailError != nil {
-		return sendMailError
-	}
-
-	return nil
+	return verificationCode, nil
 }
 
 func (v *VerificationRepository) Verify(email string, verificationCode string) (string, error) {

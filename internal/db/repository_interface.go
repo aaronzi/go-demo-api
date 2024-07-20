@@ -11,6 +11,6 @@ type UserRepositoryInterface interface {
 }
 
 type VerificationRepositoryInterface interface {
-	CreateVerification(email string) error
+	CreateVerification(email string) (string, error)
 	Verify(email string, verificationCode string) (string, error)
 }
