@@ -5,4 +5,7 @@
     "go.testFlags": [
         "-tags=unit,integration"
     ],
+    "cSpell.words": [
+        "godotenv"
+    ],
 }

@@ -19,10 +19,14 @@ func main() {
 	}
 
 	// Instantiate the repository
-	repo := &db.MovieRepository{DB: database}
+	movieRepo := &db.MovieRepository{DB: database}
+	userRepo := &db.UserRepository{DB: database}
+	verifyRepo := &db.VerificationRepository{DB: database}
 
 	// Instantiate the handler struct with the repository
-	movieHandler := &api.MovieHandler{Repo: repo}
+	movieHandler := &api.MovieHandler{Repo: movieRepo}
+	userHandler := &api.UserHandler{Repo: userRepo}
+	verifyHandler := &api.VerificationHandler{VerificationRepository: verifyRepo}
 
 	r := mux.NewRouter()
 
@@ -30,6 +34,10 @@ func main() {
 	r.HandleFunc("/movies", movieHandler.GetMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", movieHandler.GetMovie).Methods("GET")
 	r.HandleFunc("/health", movieHandler.HealthCheckHandler).Methods("GET")
+
+	// Use the methods of userHandler as HTTP handlers
+	r.HandleFunc("/users/register", userHandler.RegisterUser).Methods("POST")
+	r.HandleFunc("/verify", verifyHandler.VerifyUser).Methods("GET")
 
 	// Serve Swagger UI
 	r.PathPrefix("/swagger-ui/").Handler(httpSwagger.WrapHandler)
