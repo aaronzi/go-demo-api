@@ -24,8 +24,5 @@ go.work.sum
 # env file
 .env
 
-# IDE
-.vscode/
-
 # Output of vscode debugger (files tsarting with __debug_)
 **/__debug_*

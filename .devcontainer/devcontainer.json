@@ -3,7 +3,7 @@
 {
     "name": "Go with MySQL",
     // Specify the Docker Compose file instead of a single image
-    "dockerComposeFile": "docker-compose.yml",
+    "dockerComposeFile": "../docker-compose.yml",
     // Define the service name of your application container defined in the Docker Compose file
     "service": "app",
     "workspaceFolder": "/workspace",
