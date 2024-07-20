@@ -40,6 +40,12 @@ func (h *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if any of the required fields are empty
+	if user.Username == "" || user.Email == "" || user.Password == "" {
+		http.Error(w, "Missing required field(s)", http.StatusBadRequest)
+		return
+	}
+
 	err = h.Repo.RegisterUser(user.Username, user.Email, user.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

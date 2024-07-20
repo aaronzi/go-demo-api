@@ -8,7 +8,6 @@ type MovieRepositoryInterface interface {
 
 type UserRepositoryInterface interface {
 	RegisterUser(username string, email string, password string) error
-	CheckUser(username string, password string) error
 }
 
 type VerificationRepositoryInterface interface {

@@ -15,8 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MockRepository struct{}
-
 func (m *MockRepository) FindAllMovies() ([]db.Movie, error) {
 	return []db.Movie{{ID: "1", Title: "Mock Movie", Director: "Mock Director", Year: 2010}}, nil
 }
@@ -29,7 +27,6 @@ func (m *MockRepository) FindMovieByID(id string) (*db.Movie, error) {
 	return nil, db.ErrNotFound
 }
 
-// Tests the GetMovies handler
 func TestGetMovies_Unit(t *testing.T) {
 	mockRepo := &MockRepository{}
 	handler := api.MovieHandler{Repo: mockRepo}
