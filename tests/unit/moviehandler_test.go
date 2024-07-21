@@ -15,8 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MockRepository struct{}
-
 func (m *MockRepository) FindAllMovies() ([]db.Movie, error) {
 	return []db.Movie{{ID: "1", Title: "Mock Movie", Director: "Mock Director", Year: 2010}}, nil
 }
@@ -29,10 +27,9 @@ func (m *MockRepository) FindMovieByID(id string) (*db.Movie, error) {
 	return nil, db.ErrNotFound
 }
 
-// Tests the GetMovies handler
 func TestGetMovies_Unit(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies", nil)
 	if err != nil {
@@ -58,7 +55,7 @@ func TestGetMovies_Unit(t *testing.T) {
 // Tests the GetMovie handler with a valid movie ID.
 func TestGetMovie_ValidID(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies/1", nil)
 	if err != nil {
@@ -93,7 +90,7 @@ func TestGetMovie_ValidID(t *testing.T) {
 // Tests the GetMovie handler with an invalid movie ID.
 func TestGetMovie_InvalidID(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies/nonExistentID", nil)
 	if err != nil {

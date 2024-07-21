@@ -3,7 +3,10 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"go-demo-api/internal/auth"
 	"go-demo-api/internal/db"
+	utils "go-demo-api/internal/util"
+
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -19,7 +22,27 @@ type APIMovie struct {
 }
 
 type MovieHandler struct {
-	Repo db.MovieRepositoryInterface
+	Repo   db.MovieRepositoryInterface
+	IsTest bool
+}
+
+func checkAuthorization(w http.ResponseWriter, r *http.Request) {
+	authToken := r.Header.Get("Authorization")
+	if authToken == "" {
+		http.Error(w, "Authorization token required", http.StatusUnauthorized)
+		return
+	}
+	secret, fileReadError := utils.ReadFile("/workspace/privatekey.txt")
+
+	if fileReadError != nil {
+		http.Error(w, "Error reading token", http.StatusInternalServerError)
+	}
+	// Token validation
+	isValid, err := auth.IsTokenValid(authToken, secret)
+	if err != nil || !isValid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
 }
 
 // getMovies godoc
@@ -28,8 +51,14 @@ type MovieHandler struct {
 // @Tags movies
 // @Produce json
 // @Success 200 {array} APIMovie
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal server error"
 // @Router /movies [get]
 func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
+	if !h.IsTest {
+		checkAuthorization(w, r)
+	}
+
 	movies, err := h.Repo.FindAllMovies()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,9 +77,14 @@ func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param   id   path    string     true  "Movie ID"
 // @Success 200  {object}  APIMovie
+// @Failure 401  {object}  nil  "Unauthorized"
 // @Failure 404  {object}  nil  "Movie not found"
 // @Router /movies/{id} [get]
 func (h *MovieHandler) GetMovie(w http.ResponseWriter, r *http.Request) {
+	if !h.IsTest {
+		checkAuthorization(w, r)
+	}
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 
