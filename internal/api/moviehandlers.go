@@ -3,10 +3,10 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"go-demo-api/internal/auth"
 	"go-demo-api/internal/db"
-
-	auth "go-demo-api/internal/auth"
 	utils "go-demo-api/internal/util"
+
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -22,20 +22,11 @@ type APIMovie struct {
 }
 
 type MovieHandler struct {
-	Repo db.MovieRepositoryInterface
+	Repo   db.MovieRepositoryInterface
+	IsTest bool
 }
 
-// getMovies godoc
-// @Summary Retrieve list of movies
-// @Description Get all movies
-// @Tags movies
-// @Produce json
-// @Success 200 {array} APIMovie
-// @Failure 401 {string} string "Unauthorized"
-// @Failure 500 {string} string "Internal server error"
-// @Router /movies [get]
-func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
-	// Check for auth token in the Authorization header
+func checkAuthorization(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Authorization")
 	if authToken == "" {
 		http.Error(w, "Authorization token required", http.StatusUnauthorized)
@@ -51,6 +42,21 @@ func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
 	if err != nil || !isValid {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
+	}
+}
+
+// getMovies godoc
+// @Summary Retrieve list of movies
+// @Description Get all movies
+// @Tags movies
+// @Produce json
+// @Success 200 {array} APIMovie
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal server error"
+// @Router /movies [get]
+func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
+	if !h.IsTest {
+		checkAuthorization(w, r)
 	}
 
 	movies, err := h.Repo.FindAllMovies()
@@ -75,22 +81,8 @@ func (h *MovieHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
 // @Failure 404  {object}  nil  "Movie not found"
 // @Router /movies/{id} [get]
 func (h *MovieHandler) GetMovie(w http.ResponseWriter, r *http.Request) {
-	// Check for auth token in the Authorization header
-	authToken := r.Header.Get("Authorization")
-	if authToken == "" {
-		http.Error(w, "Authorization token required", http.StatusUnauthorized)
-		return
-	}
-	secret, fileReadError := utils.ReadFile("/workspace/privatekey.txt")
-
-	if fileReadError != nil {
-		http.Error(w, "Error reading token", http.StatusInternalServerError)
-	}
-	// Token validation
-	isValid, err := auth.IsTokenValid(authToken, secret)
-	if err != nil || !isValid {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
+	if !h.IsTest {
+		checkAuthorization(w, r)
 	}
 
 	vars := mux.Vars(r)

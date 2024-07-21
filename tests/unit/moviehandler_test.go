@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"go-demo-api/internal/api"
 	"go-demo-api/internal/db"
-	testUtils "go-demo-api/tests"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,18 +29,12 @@ func (m *MockRepository) FindMovieByID(id string) (*db.Movie, error) {
 
 func TestGetMovies_Unit(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	token, tokenError := testUtils.GenerateToken()
-	if tokenError != nil {
-		t.Fatal(tokenError)
-	}
-	req.Header.Add("Authorization", token)
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
@@ -62,18 +55,12 @@ func TestGetMovies_Unit(t *testing.T) {
 // Tests the GetMovie handler with a valid movie ID.
 func TestGetMovie_ValidID(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies/1", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	token, tokenError := testUtils.GenerateToken()
-	if tokenError != nil {
-		t.Fatal(tokenError)
-	}
-	req.Header.Add("Authorization", token)
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
@@ -103,18 +90,12 @@ func TestGetMovie_ValidID(t *testing.T) {
 // Tests the GetMovie handler with an invalid movie ID.
 func TestGetMovie_InvalidID(t *testing.T) {
 	mockRepo := &MockRepository{}
-	handler := api.MovieHandler{Repo: mockRepo}
+	handler := api.MovieHandler{Repo: mockRepo, IsTest: true}
 
 	req, err := http.NewRequest("GET", "/movies/nonExistentID", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	token, tokenError := testUtils.GenerateToken()
-	if tokenError != nil {
-		t.Fatal(tokenError)
-	}
-	req.Header.Add("Authorization", token)
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()

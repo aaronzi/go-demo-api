@@ -46,7 +46,7 @@ func main() {
 	userRepo := &user.UserRepository{DB: database, VerificationRepository: verifyRepo}
 
 	// Instantiate the handler struct with the repository
-	movieHandler := &api.MovieHandler{Repo: movieRepo}
+	movieHandler := &api.MovieHandler{Repo: movieRepo, IsTest: false}
 	userHandler := &api.UserHandler{Repo: userRepo}
 	verifyHandler := &api.VerificationHandler{VerificationRepository: verifyRepo}
 

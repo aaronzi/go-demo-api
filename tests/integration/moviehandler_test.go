@@ -28,7 +28,7 @@ func TestGetMovies_Integration(t *testing.T) {
 	repo := &db.MovieRepository{DB: database}
 
 	// Instantiate the handler struct with the repository
-	movieHandler := &api.MovieHandler{Repo: repo}
+	movieHandler := &api.MovieHandler{Repo: repo, IsTest: false}
 
 	// Setup router and server for testing
 	r := mux.NewRouter()
@@ -81,7 +81,7 @@ func TestGetMovie_Integration(t *testing.T) {
 	repo := &db.MovieRepository{DB: database}
 
 	// Instantiate the handler struct with the repository
-	movieHandler := &api.MovieHandler{Repo: repo}
+	movieHandler := &api.MovieHandler{Repo: repo, IsTest: false}
 
 	// Setup router and server for testing
 	r := mux.NewRouter()
