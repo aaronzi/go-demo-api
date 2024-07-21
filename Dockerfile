@@ -9,6 +9,8 @@ RUN go mod download
 COPY . .
 # Change to the directory where the main.go file is located
 WORKDIR /app/cmd/movie-api
+# copy the privatekey.txt file to the working directory
+COPY privatekey.txt .
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
