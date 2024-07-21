@@ -117,6 +117,18 @@ const docTemplate = `{
                                 "$ref": "#/definitions/internal_api.APIMovie"
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -149,6 +161,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/internal_api.APIMovie"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "404": {
                         "description": "Movie not found"

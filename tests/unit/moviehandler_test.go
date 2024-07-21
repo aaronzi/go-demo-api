@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"go-demo-api/internal/api"
 	"go-demo-api/internal/db"
+	testUtils "go-demo-api/tests"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,6 +37,12 @@ func TestGetMovies_Unit(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	token, tokenError := testUtils.GenerateToken()
+	if tokenError != nil {
+		t.Fatal(tokenError)
+	}
+	req.Header.Add("Authorization", token)
+
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
 	router.HandleFunc("/movies", handler.GetMovies)
@@ -61,6 +68,12 @@ func TestGetMovie_ValidID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	token, tokenError := testUtils.GenerateToken()
+	if tokenError != nil {
+		t.Fatal(tokenError)
+	}
+	req.Header.Add("Authorization", token)
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
@@ -96,6 +109,12 @@ func TestGetMovie_InvalidID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	token, tokenError := testUtils.GenerateToken()
+	if tokenError != nil {
+		t.Fatal(tokenError)
+	}
+	req.Header.Add("Authorization", token)
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()

@@ -15,6 +15,7 @@ import (
 	verification "go-demo-api/internal/db/verification"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -27,6 +28,16 @@ type testCase struct {
 	user           api.APIUser
 	expectedStatus int
 	expectedBody   string
+}
+
+func teardown(database *sql.DB) {
+	// SQL statement to delete the test user, using ? as the placeholder
+	query := "DELETE FROM Users WHERE username = ?"
+
+	// Execute the query for the test username
+	if _, err := database.Exec(query, "testuser"); err != nil {
+		log.Fatalf("Failed to clean up test user: %v", err)
+	}
 }
 
 func TestRegisterUser(t *testing.T) {
@@ -173,12 +184,48 @@ func verifyUser(t *testing.T, tc testCase, ts *httptest.Server, database *sql.DB
 	}
 }
 
-func teardown(database *sql.DB) {
-	// SQL statement to delete the test user, using ? as the placeholder
-	query := "DELETE FROM Users WHERE username = ?"
+func TestLoginUser(t *testing.T) {
+	// Initialize the database connection
+	database, err := db.NewDB()
+	if err != nil {
+		t.Fatalf("Could not connect to the database: %v", err)
+	}
 
-	// Execute the query for the test username
-	if _, err := database.Exec(query, "testuser"); err != nil {
-		log.Fatalf("Failed to clean up test user: %v", err)
+	// Instantiate the repository
+	verifyRepo := &verification.VerificationRepository{DB: database}
+	userRepo := &user.UserRepository{DB: database, VerificationRepository: verifyRepo}
+
+	// Instantiate the handler struct with the repository
+	userHandler := &api.UserHandler{Repo: userRepo}
+
+	// Create a buffer to write our multipart form data
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// Add the form fields
+	_ = writer.WriteField("identifier", "test")
+	_ = writer.WriteField("password", "test")
+	// Close the writer to finalize the multipart body
+	writer.Close()
+
+	// Create a request to pass to our handler
+	req, err := http.NewRequest("POST", "/login", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Set the content type to multipart/form-data with the boundary parameter
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// We create a ResponseRecorder to record the response
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(userHandler.LoginUser)
+
+	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+	// directly and pass in our Request and ResponseRecorder
+	handler.ServeHTTP(rr, req)
+
+	// Check the status code is what we expect
+	if status := rr.Code; status != http.StatusNoContent {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusNoContent)
 	}
 }

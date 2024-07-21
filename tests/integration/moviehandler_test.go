@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"go-demo-api/internal/api"
 	"go-demo-api/internal/db"
+	testUtils "go-demo-api/tests"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -36,10 +37,27 @@ func TestGetMovies_Integration(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	resp, err := http.Get(ts.URL + "/movies")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", ts.URL+"/movies", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// Set the Authorization header
+	token, tokenError := testUtils.GenerateToken()
+	if tokenError != nil {
+		t.Fatal(tokenError)
+	}
+	req.Header.Add("Authorization", token)
+
+	log.Printf("Request: %+v\n", req)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log.Printf("Response: %+v\n", resp)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200")
 
@@ -72,7 +90,20 @@ func TestGetMovie_Integration(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	resp, err := http.Get(ts.URL + "/movies/13d7bd2f-732b-465a-bcbe-4b0bc58c3fad")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", ts.URL+"/movies/13d7bd2f-732b-465a-bcbe-4b0bc58c3fad", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Set the Authorization header
+	token, tokenError := testUtils.GenerateToken()
+	if tokenError != nil {
+		t.Fatal(tokenError)
+	}
+	req.Header.Add("Authorization", token)
+
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
