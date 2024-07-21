@@ -95,3 +95,42 @@ func (h *VerificationHandler) VerifyUser(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User verified successfully"))
 }
+
+// LoginUser logs in a user and returns a JWT token
+// @Summary User login
+// @Description Logs in a user by identifier (username or email) and password, and returns a JWT token if successful.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce json
+// @Param identifier formData string true "Username or Email"
+// @Param password formData string true "Password"
+// @Success 200 {string} string "JWT Token"
+// @Failure 400 {object} map[string]string "Missing required field(s) or bad request"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /login [post]
+func (h *UserHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
+	// Parse form data
+	err := r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	identifier := r.FormValue("identifier")
+	password := r.FormValue("password")
+
+	// Check if any of the required fields are empty
+	if identifier == "" || password == "" {
+		http.Error(w, "Missing required field(s)", http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.Repo.LoginUser(identifier, password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(token))
+}

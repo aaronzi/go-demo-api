@@ -35,6 +35,45 @@ paths:
       summary: Health Check
       tags:
       - health
+  /login:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Logs in a user by identifier (username or email) and password,
+        and returns a JWT token if successful.
+      parameters:
+      - description: Username or Email
+        in: formData
+        name: identifier
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT Token
+          schema:
+            type: string
+        "400":
+          description: Missing required field(s) or bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User login
+      tags:
+      - users
   /movies:
     get:
       description: Get all movies

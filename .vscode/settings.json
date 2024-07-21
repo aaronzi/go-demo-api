@@ -6,6 +6,7 @@
         "-tags=unit,integration"
     ],
     "cSpell.words": [
+        "dgrijalva",
         "godotenv"
     ],
 }

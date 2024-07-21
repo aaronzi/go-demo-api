@@ -24,8 +24,8 @@ func (m *MockRepository) RegisterUser(username, email, password string) error {
 	return nil
 }
 
-func (m *MockRepository) VerifyUser(email, verificationCode string) error {
-	return nil
+func (repo *MockRepository) LoginUser(username string, password string) (string, error) {
+	return "", nil
 }
 
 var (

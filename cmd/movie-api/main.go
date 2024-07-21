@@ -40,6 +40,7 @@ func main() {
 	// Use the methods of userHandler as HTTP handlers
 	r.HandleFunc("/users/register", userHandler.RegisterUser).Methods("POST")
 	r.HandleFunc("/verify", verifyHandler.VerifyUser).Methods("GET")
+	r.HandleFunc("/login", userHandler.LoginUser).Methods("POST")
 
 	// Serve Swagger UI
 	r.PathPrefix("/swagger-ui/").Handler(httpSwagger.WrapHandler)

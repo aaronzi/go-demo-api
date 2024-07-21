@@ -5,7 +5,9 @@ import (
 	"errors"
 	"log"
 
+	auth "go-demo-api/internal/auth"
 	db "go-demo-api/internal/db"
+	utils "go-demo-api/internal/util"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -54,16 +56,30 @@ func (repo *UserRepository) RegisterUser(username string, email string, password
 	return nil
 }
 
-func (repo *UserRepository) CheckUser(username string, password string) error {
-	var NotFoundError = errors.New("username or password wrong")
+func (repo *UserRepository) LoginUser(identifier string, password string) (string, error) {
+	var NotFoundError = errors.New("identifier or password wrong") // Changed the error message to 'identifier' to generalize username/email
 	var user User
 
-	err := repo.DB.QueryRow("SELECT * FROM Users WHERE username = ?", username).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	// Adjust the SQL query to check both the username and email fields
+	err := repo.DB.QueryRow("SELECT * FROM Users WHERE username = ? OR email = ?", identifier, identifier).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return NotFoundError
+		return "", NotFoundError
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return NotFoundError
+		return "", NotFoundError
 	}
-	return nil
+	secret, fileReadError := utils.ReadFile("/workspace/privatekey.txt")
+
+	if fileReadError != nil {
+		log.Fatalf("Error reading file: %v", fileReadError)
+		return "", fileReadError
+	}
+
+	jwt, err := auth.GenerateJWT(user.ID, secret)
+	if err != nil {
+		log.Fatalf("Error generating JWT: %v", err)
+		return "", err
+	}
+
+	return jwt, nil
 }
