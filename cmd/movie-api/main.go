@@ -13,6 +13,26 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// corsMiddleware sets up the CORS headers
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")                                                                                   // Allow any origin
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")                                             // Allowed methods
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization") // Allowed headers
+
+		// Check if the request is for the OPTIONS method (pre-flight request)
+		if r.Method == "OPTIONS" {
+			// Respond with OK status for pre-flight requests
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Pass down the request to the next middleware (or final handler)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	// Initialize the database connection
 	database, err := db.NewDB()
@@ -31,6 +51,8 @@ func main() {
 	verifyHandler := &api.VerificationHandler{VerificationRepository: verifyRepo}
 
 	r := mux.NewRouter()
+
+	r.Use(corsMiddleware) // Use the CORS middleware
 
 	// Use the methods of movieHandler as HTTP handlers
 	r.HandleFunc("/movies", movieHandler.GetMovies).Methods("GET")

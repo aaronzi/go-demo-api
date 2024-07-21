@@ -40,7 +40,8 @@ paths:
       consumes:
       - multipart/form-data
       description: Logs in a user by identifier (username or email) and password,
-        and returns a JWT token if successful.
+        sets a cookie with a JWT token if successful, and returns the JWT token in
+        the response.
       parameters:
       - description: Username or Email
         in: formData
@@ -55,12 +56,16 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: JWT Token
-          schema:
-            type: string
+        "204":
+          description: Successfully logged in
         "400":
           description: Missing required field(s) or bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
           schema:
             additionalProperties:
               type: string
@@ -71,7 +76,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: User login
+      summary: User login and set cookie
       tags:
       - users
   /movies:

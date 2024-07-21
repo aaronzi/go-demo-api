@@ -13,6 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var UserRepo_NotFoundError = errors.New("identifier or password wrong")
+
 type UserRepository struct {
 	DB                     *sql.DB
 	VerificationRepository db.VerificationRepositoryInterface
@@ -57,16 +59,16 @@ func (repo *UserRepository) RegisterUser(username string, email string, password
 }
 
 func (repo *UserRepository) LoginUser(identifier string, password string) (string, error) {
-	var NotFoundError = errors.New("identifier or password wrong") // Changed the error message to 'identifier' to generalize username/email
+	// Changed the error message to 'identifier' to generalize username/email
 	var user User
 
 	// Adjust the SQL query to check both the username and email fields
 	err := repo.DB.QueryRow("SELECT * FROM Users WHERE username = ? OR email = ?", identifier, identifier).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return "", NotFoundError
+		return "", UserRepo_NotFoundError
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return "", NotFoundError
+		return "", UserRepo_NotFoundError
 	}
 	secret, fileReadError := utils.ReadFile("/workspace/privatekey.txt")
 

@@ -37,7 +37,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "Logs in a user by identifier (username or email) and password, and returns a JWT token if successful.",
+                "description": "Logs in a user by identifier (username or email) and password, sets a cookie with a JWT token if successful, and returns the JWT token in the response.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -47,7 +47,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "User login",
+                "summary": "User login and set cookie",
                 "parameters": [
                     {
                         "type": "string",
@@ -65,14 +65,20 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "JWT Token",
-                        "schema": {
-                            "type": "string"
-                        }
+                    "204": {
+                        "description": "Successfully logged in"
                     },
                     "400": {
                         "description": "Missing required field(s) or bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
