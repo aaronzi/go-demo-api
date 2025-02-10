@@ -2,7 +2,7 @@ module go-demo-api
 
 go 1.22.5
 
-require golang.org/x/crypto v0.32.0
+require golang.org/x/crypto v0.33.0
 
 require golang.org/x/sync v0.8.0 // indirect
 
