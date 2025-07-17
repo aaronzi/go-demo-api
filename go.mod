@@ -4,7 +4,10 @@ go 1.22.5
 
 require golang.org/x/crypto v0.33.0
 
-require golang.org/x/sync v0.8.0 // indirect
+require (
+	golang.org/x/mod v0.19.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -25,8 +28,8 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4
-	github.com/swaggo/swag v1.16.4
-	golang.org/x/net v0.27.0 // indirect
+	github.com/swaggo/swag v1.16.5
+	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
