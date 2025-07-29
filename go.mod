@@ -1,8 +1,8 @@
 module go-demo-api
 
-go 1.22.5
+go 1.23.0
 
-require golang.org/x/crypto v0.33.0
+require golang.org/x/crypto v0.40.0
 
 require (
 	golang.org/x/mod v0.19.0 // indirect
@@ -29,7 +29,7 @@ require (
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.6
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
